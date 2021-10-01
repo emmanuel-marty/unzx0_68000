@@ -1,4 +1,4 @@
-;  unzx0_68000.s - ZX0 decompressor for 68000 - 88 bytes
+;  unzx0_68000.s - ZX0 decompressor for 68000 - 86 bytes
 ;
 ;  in:  a0 = start of compressed data
 ;       a1 = start of decompression buffer
@@ -46,9 +46,8 @@ zx0_decompress:
                add.b d1,d1          ; read 'literal or match' bit
                bcc.s .literals      ; if 0: go copy literals
 
-.get_offset:   moveq #-2,d0         ; initialize value to $fe
-               bsr.s .elias_loop    ; read high byte of match offset
-               addq.b #1,d0         ; obtain negative offset high byte
+.get_offset:   bsr.s .get_elias     ; read high byte of match offset
+               neg.b d0             ; obtain negative offset high byte
                beq.s .done          ; exit if EOD marker
                move.w d0,d2         ; transfer negative high byte into d2
                lsl.w #8,d2          ; shift it to make room for low byte
